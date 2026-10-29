@@ -1,2 +1,2 @@
 # EE175A-Senior-Design-Project
-User InterFace
+includes the frontend, Python backend, SQLite schema, configuration, tests, and README.
