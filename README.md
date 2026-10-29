@@ -1,6 +1,6 @@
 # Parking Rover Operator Dashboard
 
-A senior design prototype for monitoring a parking rover and reviewing detected license plates. The dashboard works with simulated data. No camera, hardware, real permits, notifications, or ticketing system is connected.
+A senior design prototype for monitoring a parking rover and reviewing detected license plates. The dashboard works with simulated data. A laptop webcam can provide local live video. No rover hardware, real permits, notifications, or ticketing system is connected.
 
 ## Two ways to run it
 
@@ -80,7 +80,7 @@ For test data, you can change the seed entries in `initialize()` in `backend/ser
 - **Backend and permit matching:** edit `backend/server.py`; stop and restart it after changes. `backend/schema.sql` defines the demo tables, but changes to existing databases need migrations or a reset.
 - **Sensors:** a rover-side program could format data like `tools/send_test_data.py`; the dashboard already displays test battery, speed, position and obstacle status. Plan an authenticated, encrypted network API before connecting a remote rover. The five-second refresh is a starting point, not a real-time control loop.
 - **Plate recognition:** have the vision program send its plate, confidence and location to a secured backend. Store any evidence images separately, with access and retention rules appropriate to your project. Current data is fictional.
-- **Camera:** the current camera picture is an illustration. Integrating image snapshots or an authenticated video stream requires additional code and a suitable transport; an API URL alone does not create a video feed.
+- **Camera:** Start Camera opens the laptop webcam using browser video permission. Stop Camera stops all camera tracks. This is a local preview only; plate recognition and remote rover video are future work.
 - **Controls:** the pause/resume button changes only simulated state. There is no motor-command endpoint. Design and validate device authentication, acknowledgments, connection-loss behavior, and an independent physical emergency stop before considering real control.
 - **Hosting independently:** host the frontend and a Python-compatible backend outside ChatGPT. The local server is intentionally not production-ready: add authenticated access, HTTPS, secure device credentials, privacy controls, request limits, backups, and a production application server before exposing it. The hosted static demo has a different storage model than the local SQLite project. This ZIP contains no ChatGPT SDK or service dependency.
 
@@ -104,3 +104,19 @@ py -m unittest discover -s tests -v
 ```
 
 The test starts a local server with a temporary SQLite database, exercises demo detection, permit lookup, review, telemetry, and invalid input, and cleans up afterward. On macOS/Linux use `python3`.
+
+
+## Test with your laptop webcam
+
+1. Extract this ZIP completely. In VS Code choose **File > Open Folder** and select the folder containing `backend`, `dist`, and this README.
+2. Choose **Terminal > New Terminal** and run `py backend/server.py` (or `python backend/server.py`). No package installation is needed.
+3. Open **http://127.0.0.1:8000** in Chrome or Edge on the same laptop. Keep the server terminal running.
+4. In Camera view, click **Start Camera** and allow camera permission. The illustration and simulated detection overlay disappear while the webcam is live.
+5. Click **Stop Camera** to release the webcam and return to the illustration. Leaving/reloading the page also releases it. Start again when ready.
+6. Press **Ctrl+C** in the VS Code terminal to stop the Python server.
+
+If access is denied, use the browser's site permissions to allow Camera, then try again. Also check **Windows Settings > Privacy & security > Camera** (Windows 10: **Privacy > Camera**) and allow camera access for desktop apps. If the camera is busy, close Teams, Zoom, or other camera apps. If none is found, enable/connect your webcam. An unanswered browser permission prompt can remain open: Stop Camera cancels the dashboard request, and any camera stream granted afterward is immediately stopped. Dismiss the browser prompt separately if necessary.
+
+Use the localhost address above rather than opening the HTML file directly or an unencrypted network address. For another local port, follow Configuration above and use that port in the browser. If the page says connection refused, restart the server and leave its terminal running.
+
+The webcam requests **video only**, starts only on your click, and is not recorded, sent to the Python API, or transmitted to a remote service. No new camera packages or external services are used. The backend still handles fictional detections, review decisions, demo permits, and telemetry; webcam pictures do not drive those results. Pause patrol remains a simulation control and does not stop the webcam; use Stop Camera for that. There is no live motor control.
